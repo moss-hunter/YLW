@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鱼龙舞 - 东方玄幻集换式卡牌游戏</title>
+    <style>
+        /* 全局样式 */
+        :root {
+            --primary-color: #8e44ad;
+            --secondary-color: #e67e22;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --accent-color: #27ae60;
+            --text-color: #333;
+            --text-light: #fff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        a {
+            text-decoration: none;
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+        
+        a:hover {
+            color: var(--secondary-color);
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+        }
+        
+        .section {
+            padding: 80px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+        
+        .section-title h2 {
+            font-size: 36px;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            margin: 0 auto;
+        }
+        
+        /* 导航栏 */
+        header {
+            background-color: rgba(44, 62, 80, 0.9);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        header.scrolled {
+            background-color: var(--dark-color);
+            padding: 10px 0;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 50px;
+            margin-right: 10px;
+        }
+        
+        .logo h1 {
+            color: var(--text-light);
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            color: var(--text-light);
+            font-weight: 500;
+            position: relative;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background-color: var(--secondary-color);
+            bottom: -5px;
+            left: 0;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        /* 英雄区域 */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1547891654-e66ed7ebb968?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--text-light);
+            padding-top: 80px;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        /* 游戏特色 */
+        .features {
+            background-color: var(--light-color);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            font-size: 50px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+        
+        /* 卡牌展示 */
+        .cards-showcase {
+            background: linear-gradient(135deg, var(--dark-color), var(--primary-color));
+            color: var(--text-light);
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        
+        .card-item {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .card-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-image {
+            height: 300px;
+            overflow: hidden;
+        }
+        
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .card-item:hover .card-image img {
+            transform: scale(1.1);
+        }
+        
+        .card-info {
+            padding: 20px;
+        }
+        
+        .card-info h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .card-info p {
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+        
+        .card-rarity {
+            display: inline-block;
+            padding: 3px 10px;
+            background-color: var(--accent-color);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        /* 关于我们 */
+        .about {
+            background-color: #fff;
+        }
+        
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+        
+        .about-image img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .about-text h3 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+        }
+        
+        .about-text p {
+            margin-bottom: 15px;
+        }
+        
+        /* 新闻 */
+        .news {
+            background-color: var(--light-color);
+        }
+        
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        
+        .news-item {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .news-image {
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .news-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .news-item:hover .news-image img {
+            transform: scale(1.1);
+        }
+        
+        .news-content {
+            padding: 20px;
+        }
+        
+        .news-date {
+            display: block;
+            color: var(--secondary-color);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .news-content h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        /* 联系我们 */
+        .contact {
+            background: linear-gradient(rgba(44, 62, 80, 0.9), rgba(44, 62, 80, 0.9)), url('https://images.unsplash.com/photo-1517502884422-41eaead166d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover;
+            color: var(--text-light);
+        }
+        
+        .contact-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 50px;
+        }
+        
+        .contact-info h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .contact-info p {
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-3px);
+        }
+        
+        .contact-form .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            color: var(--text-light);
+            font-size: 16px;
+        }
+        
+        .contact-form input::placeholder,
+        .contact-form textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .contact-form textarea {
+            height: 150px;
+            resize: none;
+        }
+        
+        /* 页脚 */
+        footer {
+            background-color: var(--dark-color);
+            color: var(--text-light);
+            padding: 50px 0 20px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 2px;
+            background-color: var(--secondary-color);
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column ul li a {
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.3s ease;
+        }
+        
+        .footer-column ul li a:hover {
+            color: var(--secondary-color);
+            padding-left: 5px;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .section-title h2 {
+                font-size: 32px;
+            }
+            
+            .hero h1 {
+                font-size: 40px;
+            }
+            
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .about-image {
+                order: -1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 80px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 80px);
+                background-color: var(--dark-color);
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.5s ease;
+            }
+            
+            .nav-links.active {
+                left: 0;
+            }
+            
+            .nav-links li {
+                margin: 15px 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .hero h1 {
+                font-size: 32px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .section {
+                padding: 60px 0;
+            }
+            
+            .section-title h2 {
+                font-size: 28px;
+            }
+            
+            .feature-card {
+                padding: 20px;
+            }
+            
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <header id="header">
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <img src="C:\Users\Administrator\Downloads\set_meal_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.png" alt="鱼龙舞logo">
+                    <h1>鱼龙舞</h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#home">首页</a></li>
+                    <li><a href="#features">游戏特色</a></li>
+                    <li><a href="#cards">卡牌展示</a></li>
+                    <li><a href="#about">关于我们</a></li>
+                    <li><a href="#news">最新动态</a></li>
+                    <li><a href="#contact">联系我们</a></li>
+                </ul>
+                <button class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 英雄区域 -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <h1>东方玄幻集换式卡牌</h1>
+                <p>探索神秘东方世界，收集强大卡牌，组建你的无敌卡组，在史诗般的对决中证明你的实力！</p>
+                <div class="hero-buttons">
+                    <a href="#" class="btn">立即下载</a>
+                    <a href="#" class="btn btn-secondary">观看预告</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 游戏特色 -->
+    <section class="section features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>游戏特色</h2>
+                <p>体验独一无二的东方玄幻卡牌游戏</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-dragon"></i>
+                    </div>
+                    <h3>东方神话世界</h3>
+                    <p>沉浸于精心打造的东方玄幻世界，与传说中的神兽、仙人和妖魔相遇，体验独特的东方美学。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chess"></i>
+                    </div>
+                    <h3>策略对战</h3>
+                    <p>数百张独特卡牌，千变万化的战术组合，考验你的策略与智慧，每一场对决都充满无限可能。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>社交互动</h3>
+                    <p>与全球玩家实时对战，加入公会参与团队活动，交易卡牌完善你的收藏，打造属于你的卡牌社区。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <h3>精美艺术</h3>
+                    <p>由顶尖东方艺术家打造的视觉盛宴，每张卡牌都是精心绘制的艺术品，带给你极致的视觉享受。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3>丰富剧情</h3>
+                    <p>深入探索庞大的世界观设定，体验跌宕起伏的主线剧情，每个角色都有自己的故事等待发掘。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3>竞技赛事</h3>
+                    <p>参与定期举办的官方赛事，与顶尖玩家同台竞技，赢取丰厚奖励和专属限定卡牌。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 卡牌展示 -->
+    <section class="section cards-showcase" id="cards">
+        <div class="container">
+            <div class="section-title">
+                <h2>卡牌展示</h2>
+                <p>领略东方玄幻的独特魅力</p>
+            </div>
+            <div class="cards-container">
+                <div class="card-item">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1589998079171-988d887df646?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="青龙卡牌">
+                    </div>
+                    <div class="card-info">
+                        <h3>妙手空空</h3>
+                        <p>窃取对方手牌。自己没有手牌的场合可以额外偷取一张。</p>
+                        <span class="card-rarity">传说</span>
+                    </div>
+                </div>
+                <div class="card-item">
+                    <div class="card-image">
+                        <img src="C:\Users\Administrator\Downloads\百辟刀.png" alt="百辟刀卡牌">
+                    </div>
+                    <div class="card-info">
+                        <h3>百辟刀</h3>
+                        <p>攻击时斩破种种蒙昧杂念，守正持玄。</p>
+                        <span class="card-rarity">史诗</span>
+                    </div>
+                </div>
+                <div class="card-item">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1518562180175-34a163b1a9a3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="剑仙卡牌">
+                    </div>
+                    <div class="card-info">
+                        <h3>破魔封禁</h3>
+                        <p>将对方的卡牌移除游戏，但这种强大的效果具有时间限制。</p>
+                        <span class="card-rarity">稀有</span>
+                    </div>
+                </div>
+                <div class="card-item">
+                    <div class="card-image">
+                        <img src="https://tensor.art/images/849941290832392848?model_id=849941290832392846" alt="凤凰卡牌">
+                    </div>
+                    <div class="card-info">
+                        <h3>月下美人</h3>
+                        <p>随月相变化的宝物，具有不可思议的能力。</p>
+                        <span class="card-rarity">传说</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 关于我们 -->
+    <section class="section about" id="about">
+        <div class="container">
+            <div class="section-title">
+                <h2>关于我们</h2>
+                <p>打造东方玄幻卡牌游戏的梦想团队</p>
+            </div>
+            <div class="about-content">
+                <div class="about-text">
+                    <h3>鱼龙舞游戏工作室</h3>
+                    <p>我们是一支由资深游戏开发者和东方文化爱好者组成的团队，致力于将东方玄幻文化与现代卡牌游戏完美结合。</p>
+                    <p>团队成员来自国内外知名游戏公司，拥有丰富的集换式卡牌游戏开发经验，曾参与多款成功卡牌游戏的设计与制作。</p>
+                    <p>我们的愿景是创造一个充满东方韵味的卡牌游戏世界，让全球玩家都能感受到东方神话的独特魅力。</p>
+                    <p>《鱼龙舞》是我们倾注全部热情的心血之作，每一张卡牌都经过精心设计和反复打磨，力求为玩家带来最佳的游戏体验。</p>
+                    <a href="#" class="btn" style="margin-top: 20px;">了解更多</a>
+                </div>
+                <div class="about-image">
+                    <img src="https://images.unsplash.com/photo-1523961131990-5ea7c61b2107?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="团队工作照">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 最新动态 -->
+    <section class="section news" id="news">
+        <div class="container">
+            <div class="section-title">
+                <h2>最新动态</h2>
+                <p>关注游戏最新资讯与活动</p>
+            </div>
+            <div class="news-grid">
+                <div class="news-item">
+                    <div class="news-image">
+                        <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="新扩展包">
+                    </div>
+                    <div class="news-content">
+                        <span class="news-date">2025年6月15日</span>
+                        <h3>"九霄云外"扩展包即将上线</h3>
+                        <p>全新扩展包"九霄云外"将于下月发布，新增80张卡牌，引入天界势力与全新机制...</p>
+                        <a href="#">阅读更多 →</a>
+                    </div>
+                </div>
+                <div class="news-item">
+                    <div class="news-image">
+                        <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="锦标赛">
+                    </div>
+                    <div class="news-content">
+                        <span class="news-date">2025年5月28日</span>
+                        <h3>首届全球锦标赛圆满结束</h3>
+                        <p>来自中国的玩家"御风而行"在首届全球锦标赛中夺冠，赢得10万美元奖金和专属限定卡牌...</p>
+                        <a href="#">阅读更多 →</a>
+                    </div>
+                </div>
+                <div class="news-item">
+                    <div class="news-image">
+                        <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="周年庆">
+                    </div>
+                    <div class="news-content">
+                        <span class="news-date">2025年4月10日</span>
+                        <h3>一周年庆典活动开启</h3>
+                        <p>为庆祝游戏上线一周年，我们将举行为期两周的特别活动，登录即送传说卡牌，完成活动任务可获得丰厚奖励...</p>
+                        <a href="#">阅读更多 →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 联系我们 -->
+    <section class="section contact" id="contact">
+        <div class="container">
+            <div class="section-title">
+                <h2>联系我们</h2>
+                <p>我们期待听到您的声音</p>
+            </div>
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h3>联系方式</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 中国上海市浦东新区张江高科技园区</p>
+                    <p><i class="fas fa-phone"></i> +86 21 1234 5678</p>
+                    <p><i class="fas fa-envelope"></i> contact@yulongwu.com</p>
+                    <p><i class="fas fa-clock"></i> 周一至周五: 9:00 - 18:00</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-weibo"></i></a>
+                        <a href="#"><i class="fab fa-weixin"></i></a>
+                        <a href="#"><i class="fab fa-qq"></i></a>
+                        <a href="#"><i class="fab fa-bilibili"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <form>
+                        <div class="form-group">
+                            <input type="text" placeholder="您的姓名" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" placeholder="电子邮箱" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" placeholder="主题">
+                        </div>
+                        <div class="form-group">
+                            <textarea placeholder="您的留言"></textarea>
+                        </div>
+                        <button type="submit" class="btn">发送消息</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>鱼龙舞</h3>
+                    <p>东方玄幻集换式卡牌游戏的开拓者，致力于为玩家带来最优质的游戏体验和文化享受。</p>
+                </div>
+                <div class="footer-column">
+                    <h3>快速链接</h3>
+                    <ul>
+                        <li><a href="#home">首页</a></li>
+                        <li><a href="#features">游戏特色</a></li>
+                        <li><a href="#cards">卡牌展示</a></li>
+                        <li><a href="#about">关于我们</a></li>
+                        <li><a href="#news">最新动态</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>游戏资源</h3>
+                    <ul>
+                        <li><a href="#">游戏下载</a></li>
+                        <li><a href="#">卡牌数据库</a></li>
+                        <li><a href="#">新手教程</a></li>
+                        <li><a href="#">策略指南</a></li>
+                        <li><a href="#">赛事日历</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>法律信息</h3>
+                    <ul>
+                        <li><a href="#">用户协议</a></li>
+                        <li><a href="#">隐私政策</a></li>
+                        <li><a href="#">版权声明</a></li>
+                        <li><a href="#">家长监护</a></li>
+                        <li><a href="#">防沉迷系统</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 鱼龙舞游戏工作室. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 移动端菜单切换
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            mobileMenuBtn.innerHTML = navLinks.classList.contains('active') ? 
+                '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+        });
+        
+        // 导航栏滚动效果
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                if (navLinks.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                }
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
